@@ -12,10 +12,7 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
+    // use linkFramework instead of linkSystemLibrary to make it work on macos
+    opencl.linkFramework("OpenCL", .{});
     opencl.addIncludePath(headers.path(""));
-    // TODO: Instead of relying on a system package,
-    // we should either package the OpenCL-ICD-Loader
-    // with Zig or manually load function pointers
-    // from the OpenCL library.
-    opencl.linkSystemLibrary("OpenCL", .{});
 }
