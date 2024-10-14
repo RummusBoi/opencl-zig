@@ -675,7 +675,7 @@ pub const Event = extern struct {
     pub fn clGetEventInfo(
         event: Event,
         param_name: EventInfoParam,
-    ) !i32 {
+    ) !EventInfo {
         switch (param_name) {
             .CL_EVENT_COMMAND_EXECUTION_STATUS => {
                 switch (c.clGetEventInfo(event.handle, c.CL_EVENT_COMMAND_EXECUTION_STATUS, 0, null, null)) {
