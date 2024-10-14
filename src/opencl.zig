@@ -661,17 +661,34 @@ pub const Kernel = extern struct {
 
 pub const createKernel = Kernel.create;
 
+pub const EventInfoParam = enum {
+    CL_EVENT_COMMAND_EXECUTION_STATUS,
+};
+pub const EventInfo = enum {
+    CL_QUEUED,
+    CL_SUBMITTED,
+    CL_RUNNING,
+    CL_COMPLETE,
+};
 pub const Event = extern struct {
     handle: c.cl_event,
-
-    pub fn release(event: Event) void {
-        switch (c.clReleaseEvent(event.handle)) {
-            c.CL_SUCCESS => {},
-            c.CL_INVALID_EVENT => unreachable,
-            // Ignore any errors
-            c.CL_OUT_OF_RESOURCES => {},
-            c.CL_OUT_OF_HOST_MEMORY => {},
-            else => @panic("Undocumented error"),
+    pub fn clGetEventInfo(
+        event: Event,
+        param_name: EventInfoParam,
+    ) !i32 {
+        switch (param_name) {
+            .CL_EVENT_COMMAND_EXECUTION_STATUS => {
+                switch (c.clGetEventInfo(event.handle, c.CL_EVENT_COMMAND_EXECUTION_STATUS, 0, null, null)) {
+                    c.CL_QUEUED => return EventInfo.CL_QUEUED,
+                    c.CL_SUBMITTED => return EventInfo.CL_SUBMITTED,
+                    c.CL_RUNNING => return EventInfo.CL_RUNNING,
+                    c.CL_COMPLETE => return EventInfo.CL_COMPLETE,
+                    else => |error_code| {
+                        std.debug.print("Received error code: {}", .{error_code});
+                        @panic("Undocumented error");
+                    },
+                }
+            },
         }
     }
 
