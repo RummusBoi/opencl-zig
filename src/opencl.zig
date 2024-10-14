@@ -332,11 +332,11 @@ pub const CommandQueue = extern struct {
         kernel: Kernel,
         maybe_global_work_offset: ?[]const usize,
         global_work_size: []const usize,
-        local_work_size: []const usize,
+        maybe_local_work_size: ?[]const usize,
         wait_list: []const Event,
     ) !Event {
         const work_dim = global_work_size.len;
-        std.debug.assert(work_dim == local_work_size.len);
+        if (maybe_local_work_size) |local_work_size| std.debug.assert(work_dim == local_work_size.len);
         if (maybe_global_work_offset) |global_work_offset| {
             std.debug.assert(work_dim == global_work_offset.len);
         }
@@ -348,7 +348,7 @@ pub const CommandQueue = extern struct {
             @intCast(work_dim),
             if (maybe_global_work_offset) |global_work_offset| global_work_offset.ptr else null,
             global_work_size.ptr,
-            local_work_size.ptr,
+            if (maybe_local_work_size) |local_work_size| local_work_size.ptr else null,
             @intCast(wait_list.len),
             if (wait_list.len == 0) null else @ptrCast(wait_list.ptr),
             &event.handle,
