@@ -692,6 +692,17 @@ pub const Event = extern struct {
         }
     }
 
+    pub fn release(event: Event) void {
+        switch (c.clReleaseEvent(event.handle)) {
+            c.CL_SUCCESS => {},
+            c.CL_INVALID_EVENT => unreachable,
+            // Ignore any errors
+            c.CL_OUT_OF_RESOURCES => {},
+            c.CL_OUT_OF_HOST_MEMORY => {},
+            else => @panic("Undocumented error"),
+        }
+    }
+
     pub fn retain(event: Event) !void {
         switch (c.clRetainEvent(event.handle)) {
             c.CL_SUCCESS => {},
