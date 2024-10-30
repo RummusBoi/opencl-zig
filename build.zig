@@ -17,7 +17,7 @@ pub fn build(b: *std.Build) void {
         // use linkFramework instead of linkSystemLibrary to make it work on macos
         opencl.linkFramework("OpenCL", .{});
     } else {
-        opencl.linkSystemLibrary("OpenCL");
+        opencl.linkSystemLibrary("OpenCL", .{});
     }
 
     opencl.addIncludePath(headers.path(""));
