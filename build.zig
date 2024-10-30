@@ -1,4 +1,5 @@
 const std = @import("std");
+const builtin = @import("builtin");
 
 pub fn build(b: *std.Build) void {
     const target = b.standardTargetOptions(.{});
@@ -12,7 +13,12 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-    // use linkFramework instead of linkSystemLibrary to make it work on macos
-    opencl.linkFramework("OpenCL", .{});
+    if (builtin.os.tag == .macos) {
+        // use linkFramework instead of linkSystemLibrary to make it work on macos
+        opencl.linkFramework("OpenCL", .{});
+    } else {
+        opencl.linkSystemLibrary("OpenCL");
+    }
+
     opencl.addIncludePath(headers.path(""));
 }
